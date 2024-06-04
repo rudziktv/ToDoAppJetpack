@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.todoapp.ui.theme.ToDoAppTheme
+import java.io.Console
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,11 +135,15 @@ fun MainScreen (dialogOpened: MutableState<Boolean>, goals: MutableList<Goal>, m
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoalCard(goal: Goal) {
     Card (modifier = Modifier
         .fillMaxWidth()
-        .padding(horizontal = 12.dp, vertical = 6.dp)) {
+        .padding(horizontal = 12.dp, vertical = 6.dp),
+        onClick = {
+            // open goal
+        }) {
         Column (modifier = Modifier.padding(12.dp)) {
             var count = if (goal.tasks.isEmpty()) 1f else goal.tasks.count()
             Text(text = goal.title, fontSize = 20.sp)
@@ -152,3 +158,6 @@ fun GoalCard(goal: Goal) {
         }
     }
 }
+
+@Composable
+fun GoalScreen(goal: Goal) {}
