@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import kotlin.random.Random
 
 
 data class Task(var id: Int, val name: String, var done: Boolean = false)
