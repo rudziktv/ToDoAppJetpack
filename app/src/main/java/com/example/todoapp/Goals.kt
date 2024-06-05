@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -30,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,10 +48,16 @@ fun GoalScreen(goal: Goal, getBack: ()->Unit) {
     val dialogOpen = remember { mutableStateOf(false) }
     val tasks = remember { mutableStateListOf<Task>() }
     var progress by remember { mutableFloatStateOf(0f) }
+    var amount by remember { mutableIntStateOf(0) }
+    var done by remember { mutableIntStateOf(0) }
 
 //    val count = if (tasks.isEmpty()) 1f else tasks.count()
     fun reload() {
         val count = if (tasks.isEmpty()) 1f else tasks.count().toFloat()
+
+        amount = tasks.count()
+        done = tasks.count{ task -> task.done }
+
         progress = tasks.count{ task -> task.done } / count
     }
 
@@ -83,7 +89,7 @@ fun GoalScreen(goal: Goal, getBack: ()->Unit) {
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(text = goal.name, fontSize = 24.sp)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "21/37", fontSize = 12.sp)
+                Text(text = "$done/$amount", fontSize = 12.sp)
             }
             IconButton(onClick = { dialogOpen.value = true }) {
                 Icon(Icons.Rounded.Add, contentDescription = null)
@@ -93,7 +99,7 @@ fun GoalScreen(goal: Goal, getBack: ()->Unit) {
             progress = progress,
             modifier = Modifier.fillMaxWidth())
 
-        LazyColumn () {
+        LazyColumn {
             itemsIndexed(tasks) {index, task ->
                 TaskItem(task, delete = {
                     tasks.removeAt(index)
@@ -113,7 +119,7 @@ fun GoalScreen(goal: Goal, getBack: ()->Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GoalCard(goal: Goal, select: () -> Unit) {
+fun GoalCard(goal: Goal, select: () -> Unit, delete: () -> Unit) {
     Card (modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -136,7 +142,10 @@ fun GoalCard(goal: Goal, select: () -> Unit) {
                     DropdownMenuItem(
                         text = { Text("Delete") },
                         leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = "") },
-                        onClick = { /*TODO*/ })
+                        onClick = {
+                            expanded = false
+                            delete()
+                        })
                 }
             }
 

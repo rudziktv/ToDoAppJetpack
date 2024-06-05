@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
@@ -99,7 +99,11 @@ fun MainScreen (
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
             )
             LazyColumn {
-                items(goals) {item -> GoalCard(goal = item, select = { currentGoal.value = item })}
+                itemsIndexed(goals) {index, item -> GoalCard(
+                    goal = item,
+                    select = { currentGoal.value = item },
+                    delete = { goals.removeAt(index) }
+                )}
             }
             if (dialogOpened.value)
                 Dialog(
