@@ -63,6 +63,7 @@ fun GoalScreen(goal: Goal, getBack: ()->Unit) {
 
     LaunchedEffect(null) {
         tasks.addAll(goal.tasks)
+        reload()
     }
 
 
@@ -103,6 +104,7 @@ fun GoalScreen(goal: Goal, getBack: ()->Unit) {
             itemsIndexed(tasks) {index, task ->
                 TaskItem(task, delete = {
                     tasks.removeAt(index)
+                    goal.tasks = tasks
                     reload()
                 }, onDone = { reload() })
                 if (tasks.count() - 1 != index) {
