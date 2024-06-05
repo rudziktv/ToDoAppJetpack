@@ -7,8 +7,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,8 +35,14 @@ import androidx.compose.ui.window.Dialog
 data class Task(var id: Int, val name: String, var done: Boolean = false)
 
 @Composable
-fun NewTaskDialog(goal: Goal, tasks: MutableList<Task>, dialogOpen: MutableState<Boolean>) {
+fun NewTaskDialog(
+    goal: Goal,
+    tasks: MutableList<Task>,
+    dialogOpen: MutableState<Boolean>,
+    reload: () -> Unit
+) {
     var newTaskName by remember { mutableStateOf("") }
+
 
     Dialog(
         onDismissRequest = { dialogOpen.value = false },
@@ -57,6 +70,9 @@ fun NewTaskDialog(goal: Goal, tasks: MutableList<Task>, dialogOpen: MutableState
                             goal.lastTaskId++
                             if (newTaskName.isNotEmpty()) {
                                 tasks.add(Task(id = goal.lastTaskId, name = newTaskName))
+                                goal.tasks = mutableListOf()
+                                goal.tasks.addAll(tasks)
+                                reload()
                             }
                             newTaskName = ""
                             dialogOpen.value = false
@@ -71,15 +87,40 @@ fun NewTaskDialog(goal: Goal, tasks: MutableList<Task>, dialogOpen: MutableState
 }
 
 @Composable
-fun TaskItem(task: Task) {
+fun TaskItem(task: Task, delete: () -> Unit, onDone: () -> Unit) {
     var done by remember { mutableStateOf(task.done) }
+    var expanded by remember { mutableStateOf(false) }
+    
     ListItem(
         headlineContent = {Text(task.name)},
+        trailingContent = {
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    Icons.Rounded.MoreVert,
+                    contentDescription = null
+                )
+            }
+            DropdownMenu(expanded, onDismissRequest = { 
+                expanded = false
+            }) {
+                DropdownMenuItem(
+                    leadingIcon = { Icon(
+                        Icons.Rounded.Delete,
+                        contentDescription = null
+                    ) },
+                    text = { Text("Delete") },
+                    onClick = {
+                    expanded = false
+                    delete()
+                })
+            }
+        },
         leadingContent = { Checkbox(
         checked = done,
         onCheckedChange = { checked ->
             done = checked
             task.done = checked
-        }
+            onDone()
+        },
     )})
 }

@@ -27,7 +27,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,12 +46,26 @@ data class Goal(var index: Int, var tasks: MutableList<Task>, val name: String, 
 fun GoalScreen(goal: Goal, getBack: ()->Unit) {
 
     val dialogOpen = remember { mutableStateOf(false) }
-//    val tasks = remember { mutableStateListOf<Task>() }
+    val tasks = remember { mutableStateListOf<Task>() }
+    var progress by remember { mutableFloatStateOf(0f) }
+
+//    val count = if (tasks.isEmpty()) 1f else tasks.count()
+    fun reload() {
+        val count = if (tasks.isEmpty()) 1f else tasks.count().toFloat()
+        progress = tasks.count{ task -> task.done } / count
+    }
+
+    LaunchedEffect(null) {
+        tasks.addAll(goal.tasks)
+    }
+
+
+
 //    tasks.addAll(goal.tasks)
 
-//    LaunchedEffect(tasks) {
-//        goal.tasks = tasks
-//    }
+    LaunchedEffect(tasks) {
+        goal.tasks = tasks
+    }
 
     Column {
         
@@ -72,19 +89,24 @@ fun GoalScreen(goal: Goal, getBack: ()->Unit) {
                 Icon(Icons.Rounded.Add, contentDescription = null)
             }
         }
-        LinearProgressIndicator(progress = 1f, modifier = Modifier.fillMaxWidth())
+        LinearProgressIndicator(
+            progress = progress,
+            modifier = Modifier.fillMaxWidth())
 
         LazyColumn () {
-            itemsIndexed(goal.tasks) {index, task ->
-                TaskItem(task)
-                if (goal.tasks.count() - 1 != index) {
+            itemsIndexed(tasks) {index, task ->
+                TaskItem(task, delete = {
+                    tasks.removeAt(index)
+                    reload()
+                }, onDone = { reload() })
+                if (tasks.count() - 1 != index) {
                     Divider()
                 }
             }
         }
 
         if (dialogOpen.value) {
-            NewTaskDialog(goal, goal.tasks, dialogOpen)
+            NewTaskDialog(goal, tasks, dialogOpen, reload = { reload() })
         }
     }
 }
