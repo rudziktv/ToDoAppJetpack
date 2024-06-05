@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -66,4 +68,18 @@ fun NewTaskDialog(goal: Goal, tasks: MutableList<Task>, dialogOpen: MutableState
             }
         }
     )
+}
+
+@Composable
+fun TaskItem(task: Task) {
+    var done by remember { mutableStateOf(task.done) }
+    ListItem(
+        headlineContent = {Text(task.name)},
+        leadingContent = { Checkbox(
+        checked = done,
+        onCheckedChange = { checked ->
+            done = checked
+            task.done = checked
+        }
+    )})
 }

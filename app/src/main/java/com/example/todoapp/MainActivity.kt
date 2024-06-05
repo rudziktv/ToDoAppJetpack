@@ -48,6 +48,8 @@ class MainActivity : ComponentActivity() {
                 val goals = remember { mutableStateListOf<Goal>() }
                 val currentGoal = remember { mutableStateOf<Goal?>(null) }
 
+
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     floatingActionButton =
